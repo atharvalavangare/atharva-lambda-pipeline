@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/your-username/atharva-lambda-pipeline.git'
+                git 'https://github.com/atharvalavangare/atharva-lambda-pipeline.git'
             }
         }
 
