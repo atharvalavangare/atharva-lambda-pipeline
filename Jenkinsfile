@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = 'ap-south-1'
-        LAMBDA_FUNCTION_NAME = 'data-processor-lambda'
+        AWS_DEFAULT_REGION = 'us-east-1'
+        FUNCTION_NAME = 'atharva-lambda'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/atharvalavangare/atharva-lambda-pipeline.git', branch: 'main'
+                git branch: 'main', url: 'https://github.com/atharvalavangare/atharva-lambda-pipeline.git'
             }
         }
 
@@ -21,13 +21,11 @@ pipeline {
 
         stage('Deploy Lambda') {
             steps {
-                withAWS(region: "${env.AWS_REGION}", credentials: 'aws-jenkins-creds') {
-                    sh '''
+                sh '''
                     aws lambda update-function-code \
-                      --function-name ${LAMBDA_FUNCTION_NAME} \
+                      --function-name $FUNCTION_NAME \
                       --zip-file fileb://function.zip
-                    '''
-                }
+                '''
             }
         }
     }
