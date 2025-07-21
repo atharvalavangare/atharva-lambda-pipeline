@@ -3,32 +3,31 @@ pipeline {
 
     environment {
         AWS_REGION = 'ap-south-1'
-        FUNCTION_NAME = 'atharva-lambda-demo'
+        LAMBDA_FUNCTION_NAME = 'data-processor-lambda'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/atharvalavangare/atharva-lambda-pipeline.git'
+                git url: 'https://github.com/atharvalavangare/atharva-lambda-pipeline.git', branch: 'main'
             }
         }
 
         stage('Zip Lambda') {
             steps {
-                dir('lambda') {
-                    sh 'zip -r ../lambda_function_payload.zip .'
-                }
+                sh 'zip function.zip lambda_function.py'
             }
         }
 
         stage('Deploy Lambda') {
             steps {
-                sh """
-                aws lambda update-function-code \
-                  --function-name $FUNCTION_NAME \
-                  --zip-file fileb://lambda_function_payload.zip \
-                  --region $AWS_REGION
-                """
+                withAWS(region: "${env.AWS_REGION}", credentials: 'aws-jenkins-creds') {
+                    sh '''
+                    aws lambda update-function-code \
+                      --function-name ${LAMBDA_FUNCTION_NAME} \
+                      --zip-file fileb://function.zip
+                    '''
+                }
             }
         }
     }
